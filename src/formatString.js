@@ -43,8 +43,20 @@ export default function formatString(string, shallow, expanded, name) {
   if (name) span.appendChild(inspectName(name));
   const textValue = span.appendChild(document.createElement("span"));
   textValue.className = "observablehq--string";
-  textValue.textContent = JSON.stringify(string.length > 100 ?
-    `${string.slice(0, 50)}…${string.slice(-49)}` : string);
+  if(string.length <= 100) textValue.textContent = JSON.stringify(string);
+  else {
+    const dots = document.createElement('span');
+    dots.title = `Show ${string.length-100} remaining characters`;
+    dots.onlick = () => {
+      const text = JSON.stringify(string.slice(50, -49)).slice(1, -1);
+      dots.replaceWith(document.createTextNode(text));
+    };
+    span.append(
+      document.createTextNode(JSON.stringify(string.slice(0, 50))).slice(0, -1),
+      dots,
+      document.createTextNode(JSON.stringify(string.slice(-49))).slice(1),
+    );
+  }
   return span;
 }
 
